@@ -21,7 +21,7 @@ Fixpoint bsize (t:BTree): BN :=
 (* Balance condition on Braun trees *)
 Inductive bbal : BTree -> Prop:= 
  |bbalE : bbal E 
- |bbalN : forall (a: A) (s t: BTree), bbal s -> bbal t -> (bsize t) ≤ BN (bsize s) -> (
+ |bbalN : forall (a: A) (s t: BTree), bbal s -> bbal t -> (bsize t) ≤BN (bsize s) -> (
                                       bsize s) ≤BN (sucBN (bsize t)) -> 
                                       bbal (N a s t).
 

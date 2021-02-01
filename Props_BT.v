@@ -289,4 +289,68 @@ Lemma bbal_inv: forall (t:BTree), t <> E ->
                           (exists (z:A), t = N z E E)  \/ 
                            exists (z:A) (r1 r2:BTree), bbal r1 /\ bbal r2 /\ r1 <> E /\ t = N z r1 r2.
 Proof.
-Admitted.
+intros.
+assert (bbal t).
++ apply allBal.
++ induction t.
+  - contradiction.
+  - destruct t1, t2.
+    * left; exists a; trivial.
+    * inversion H0.
+      inversion H6.
+      ** assert (Z <> sucBN (bsize t2_1 ⊞ bsize t2_2)).
+         ++ apply ZnotSucBN.
+         ++ rewrite H10 in H9; contradiction.
+      ** inversion H8.
+    * right.
+      exists a; exists (N a0 t1_1 t1_2); exists E.
+      split.
+      ** assert (N a0 t1_1 t1_2 <> E).
+         ++ discriminate.
+         ++ apply IHt1 in H1.
+            -- destruct H1.
+               +++ destruct H1.
+                   rewrite H1.
+                   do 2 constructor.
+                   simpl.
+                   constructor.
+               +++ constructor.
+                   *** destruct H1.
+                       do 2 destruct H1.
+                       destruct H1.
+                       destruct H2.
+                       destruct H3.
+                       inversion H4.
+                       trivial.
+                   *** destruct H1.
+                       do 2 destruct H1.
+                       destruct H1.
+                       destruct H2.
+                       destruct H3.
+                       inversion H4.
+                       trivial.
+                   *** inversion H0.
+                       inversion H5.
+                       trivial.
+                   *** inversion H0.
+                       inversion H5.
+                       trivial.
+            -- inversion H0.
+               trivial.
+      ** split.
+         ++ constructor.
+         ++ split.
+            -- discriminate.
+            -- trivial.
+    * right; exists a.
+      exists (N a0 t1_1 t1_2); exists (N a1 t2_1 t2_2).
+      split.
+      ** inversion H0.
+         trivial.
+      ** split.
+         ++ inversion H0.
+            trivial.
+         ++ split.
+            -- discriminate.
+            -- trivial.
+Qed.
