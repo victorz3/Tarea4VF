@@ -1,3 +1,5 @@
 -Q . Tarea3VF
 Defs_BN.v
 Props_BN.v
+Defs_BT.v
+Props_BT.v

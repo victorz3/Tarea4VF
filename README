@@ -1,3 +1,6 @@
 Tarea 4 de Verificación Formal
 Nombre: Víctor Zamora Gutiérrez
 Número de Cuenta: 311529058
+Cómo utilizar:
+La biblioteca está estructurada como se especifica en el pdf de la tarea. Los ejercicios están en el archivo Props_BT.v (salvo el 1 que está en Defs_BT.v). Cada ejercicio tiene un comentario arriba que dice EJERCICIO X
+Intenté acomodar el _CoqProject como me dijiste Fer, aunque mi versión de Coq me lo acepta con solo la primera línea.
