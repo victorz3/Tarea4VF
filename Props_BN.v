@@ -124,6 +124,17 @@ simpl.
 discriminate.
 Qed.
 
+(* Conmutación del lema anterior. *)
+Lemma suc_not_z: forall (a:BN), sucBN a <> Z.
+Proof.
+intro.
+intro.
+assert (Z <> sucBN a).
++ apply (ZnotSucBN).
++ rewrite H in H0.
+  contradiction.
+Qed.
+
 Lemma notSucBN : forall (a:BN), a <> sucBN a.
 Proof.
 intros.
@@ -143,7 +154,8 @@ exists b;left;trivial.
 exists b;right;trivial.
 Qed.
 
-Lemma predBNUD: forall (a:BN), a <> Z -> predBN (U a) = D (predBN a).
+Lemma 
+predBNUD: forall (a:BN), a <> Z -> predBN (U a) = D (predBN a).
 Proof.
 intros.
 destruct a.
@@ -1345,4 +1357,219 @@ split.
   constructor; trivial.
 + intro.
   inversion H; trivial.
+Qed.
+
+(* a < suc b -> U a < D b *)
+Lemma lt_suc_u_d: forall (a b: BN), a <BN sucBN b -> U a <BN D b.
+Proof.
+intros.
+apply lte_U_D.
+apply lt1; trivial.
+Qed.
+
+(* Sucesores menores implica menores. *)
+Lemma suc_lt: forall (a b: BN), sucBN a <BN sucBN b -> a <BN b.
+Proof.
+induction a.
++ intros.
+  destruct b; simpl in H.
+  * inversion H.
+    apply z_not_gt in H2.
+    contradiction.
+  * constructor.
+  * constructor.
++ intros.
+  destruct b.
+  * inversion H.
+    apply z_not_gt in H2.
+    contradiction.
+  * constructor.
+    inversion H.
+    trivial.
+  * inversion H.
+    apply lt_suc_u_d.
+    trivial.
++ intros.
+  destruct b.
+  * inversion H.
+    apply z_not_gt in H2; contradiction.
+  * inversion H.
+    - constructor.
+      apply lts.
+    - constructor.
+      apply (ltBN_trans a (sucBN a) b).
+      ++ apply lts.
+      ++ trivial.
+  * inversion H.
+    constructor.
+    apply IHa.
+    trivial.
+Qed.
+
+(* Z < S quien sea *)
+Lemma z_lt_suc: forall a, Z <BN sucBN a.
+Proof.
+destruct a.
++ simpl; constructor.
++ simpl; constructor.
++ simpl; constructor.
+Qed.
+
+(* 2k+2 < 2k+3 *)
+Lemma lt_D_suc: forall a, D a <BN U (sucBN a).
+Proof.
+induction a.
++ simpl.
+  constructor.
+  constructor.
++ simpl.
+  constructor.
+  constructor.
++ simpl.
+  constructor.
+  apply IHa.
+Qed.
+
+(* D a < U b -> suc a < b *)
+Lemma D_lt: forall a b, D a <BN U b -> sucBN a ≤BN b.
+Proof.
+induction a.
++ intros.
+  simpl.
+  destruct b eqn:B.
+  - inversion H.
+    inversion H2.
+  - destruct b0 eqn:B0.
+    * constructor.
+    * do 3 constructor.
+    * do 3 constructor.
+  - destruct b0 eqn:B0.
+    * do 2 constructor.
+    * do 3 constructor.
+    * do 3 constructor.
++ intros.
+  simpl.
+  destruct b eqn:B.
+  - inversion H.
+    inversion H2.
+  - inversion H.
+    constructor.
+    constructor.
+    inversion H2.
+    trivial. 
+  - inversion H.
+    destruct b0 eqn:B0.
+    * inversion H2.
+      ++ constructor.
+      ++ do 2 constructor; trivial.
+    * inversion H2.
+      ++ constructor.
+      ++ do 2 constructor; trivial.
+    * replace (D a) with (sucBN (U a)).
+      ++ apply lt_suc_lteq.
+         trivial.
+      ++ reflexivity.
++ intros.
+  destruct b eqn:B.
+  - inversion H.
+    inversion H2.
+  - inversion H.
+    simpl.
+    apply leq_impl_u.
+    apply IHa.
+    trivial.
+  - inversion H.
+    simpl. 
+    apply leq_impl_u_d.
+    apply IHa.
+    constructor.
+    inversion H2.
+    trivial.
+Qed.
+ 
+(* Lema auxiliar, sucesor conserva desigualdad. *)
+Lemma suc_le: forall a b, a <BN b -> sucBN a <BN sucBN b.
+Proof.
+induction a.
++ intros.
+  simpl.
+  destruct b eqn:B.
+  - inversion H.
+  - simpl.
+    apply lte_U_D.
+    destruct b0 eqn:B0; constructor.
+    * constructor.
+    * constructor.
+  - simpl.
+    constructor.
+    apply z_lt_suc.
++ intros.
+  destruct b eqn:B.
+  - inversion H.
+  - inversion H.
+    simpl.
+    constructor.
+    trivial.
+  - simpl.
+    inversion H.
+    apply U_D_lte in H.
+    * inversion H.
+      -- constructor.
+         apply lts.
+      -- apply lt_D_suc.
+    * constructor.
+      apply (ltBN_trans a b0 (sucBN b0)).
+      -- trivial.
+      -- apply lts.
++ intros.
+  destruct b eqn:B.
+  - apply z_not_gt in H; contradiction.
+  - simpl.
+    apply D_lt in H.
+    inversion H.
+    * constructor.
+    * constructor; trivial.
+  - simpl.
+    constructor.
+    apply IHa.
+    inversion H.
+    trivial.
+Qed.
+
+(* Lema auxiliar *)
+Lemma u_plus_sucu: forall b, exists x, sucBN ((U b) ⊞ predBN (U b)) = D x.
+Proof.
+destruct b.
++ exists Z.
+  reflexivity.
++ rewrite predBNUD.
+  - simpl.
+    exists ((sucBN
+       match match b with
+             | Z => Z
+             | _ => D (predBN b)
+             end with
+       | Z => U b
+       | U y => D (b ⊞ y)
+       | D y => U (sucBN (b ⊞ y))
+       end)).
+    trivial.
+  - discriminate.
++ simpl.
+  exists (D (sucBN (b ⊞ b))).
+  trivial.
+Qed.
+
+(* Lema auxiliar *)
+Lemma d_plus_sucd: forall b, exists x, sucBN ((D b) ⊞ predBN (D b)) = D x.
+Proof.
+destruct b.
++ exists (U Z).
+  reflexivity.
++ simpl.
+  exists (U (sucBN (b ⊞ b))).
+  trivial.
++ simpl.
+  exists (U (sucBN (sucBN (b ⊞ b)))).
+  trivial.
 Qed.
